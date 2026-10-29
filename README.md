@@ -1,6 +1,3 @@
-将 `README.md` 的内容完整替换为以下内容：
-
-````markdown
 # LangChain Assistant
 
 一个用于学习 LangChain、Tool、Agent、Memory 和 RAG 的命令行智能助手项目。
@@ -347,4 +344,3 @@ chroma_db/
 - 当前只读取一个 Markdown 知识库文件。
 - 修改知识库后需要手动重新建立索引。
 - 项目依赖 Windows Ollama 或其他能够通过配置地址访问的 Ollama 服务。
-````
