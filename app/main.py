@@ -1,43 +1,53 @@
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
+from langchain.agents import create_agent
 
 from app.model import create_model
+from app.tools import calculate_total
 
 
 def main():
     model = create_model()
 
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            (
-                "system",
-                "你是一名耐心的编程老师，回答要准确、通俗，并给出一个简单例子。",
-            ),
-            (
-                "human",
-                "请向{learner}解释{topic}，控制在300字以内。",
-            ),
-        ]
+    agent = create_agent(
+        model=model,
+        tools=[calculate_total],
+        system_prompt=(
+            "你是一名耐心、准确的智能助手。"
+            "遇到商品总价问题时使用计算工具，不要自己猜测计算结果。"
+        ),
     )
 
-    output_parser = StrOutputParser()
-    chain = prompt | model | output_parser
+    question = input("请输入问题：").strip()
 
-    topic = input("请输入想了解的编程概念：").strip()
-
-    if not topic:
-        print("主题不能为空。")
+    if not question:
+        print("问题不能为空。")
         return
 
-    result = chain.invoke(
+    result = agent.invoke(
         {
-            "learner": "学过 Python 基础语法的初学者",
-            "topic": topic,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": question,
+                }
+            ]
         }
     )
 
-    print("\n模型回答：")
-    print(result)
+    print("\nAgent 运行过程：")
+
+    for message in result["messages"]:
+        print(f"\n消息类型：{message.type}")
+        print(f"消息内容：{message.content}")
+
+        tool_calls = getattr(message, "tool_calls", None)
+
+        if tool_calls:
+            print(f"工具调用：{tool_calls}")
+
+    final_message = result["messages"][-1]
+
+    print("\n助手回答：")
+    print(final_message.content)
 
 
 if __name__ == "__main__":
