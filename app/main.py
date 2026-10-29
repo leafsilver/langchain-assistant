@@ -2,7 +2,7 @@ from langchain.agents import create_agent
 from langgraph.checkpoint.memory import InMemorySaver
 
 from app.model import create_model
-from app.tools import calculate_total
+from app.tools import calculate_total, search_course_handbook
 
 
 def main():
@@ -11,10 +11,12 @@ def main():
 
     agent = create_agent(
         model=model,
-        tools=[calculate_total],
+        tools=[calculate_total, search_course_handbook],
         system_prompt=(
             "你是一名耐心、准确的智能助手。"
             "遇到商品总价问题时使用计算工具，不要自己猜测计算结果。"
+            "凡是涉及训练营或训练营手册的任何问题，"
+            "必须先使用知识库工具查询，不要依靠已有知识猜测。"
         ),
         checkpointer=checkpointer,
     )
